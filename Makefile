@@ -1,8 +1,11 @@
 include .env
 export $(shell sed 's/=.*//' .env)
 
-tern_migrate:
+migration_run:
 	tern migrate --migrations ./internal/store/pgstore/migrations --config ./internal/store/pgstore/migrations/tern.conf
+
+migration_create:
+	cd ./internal/store/pgstore/migrations/ && tern new  $(name)
 
 sqlc_generate:
 	sqlc generate -f ./internal/store/pgstore/sqlc.yml
