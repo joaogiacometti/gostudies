@@ -1,4 +1,4 @@
-module github.com/joaogiacometti/gostudies
+module github.com/joaogiacometti/gocards
 
 go 1.24.2
 

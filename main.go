@@ -11,10 +11,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joaogiacometti/gostudies/api"
-	"github.com/joaogiacometti/gostudies/flashcards"
-	"github.com/joaogiacometti/gostudies/reviews"
-	"github.com/joaogiacometti/gostudies/users"
+	"github.com/joaogiacometti/gocards/api"
+	"github.com/joaogiacometti/gocards/flashcards"
+	"github.com/joaogiacometti/gocards/reviews"
+	"github.com/joaogiacometti/gocards/users"
 	"github.com/joho/godotenv"
 )
 

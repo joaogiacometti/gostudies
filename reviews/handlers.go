@@ -8,9 +8,9 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/joaogiacometti/gostudies/constants"
-	"github.com/joaogiacometti/gostudies/flashcards"
-	"github.com/joaogiacometti/gostudies/jsonutils"
+	"github.com/joaogiacometti/gocards/constants"
+	"github.com/joaogiacometti/gocards/flashcards"
+	"github.com/joaogiacometti/gocards/jsonutils"
 )
 
 type ReviewHandler struct {

@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/joaogiacometti/gostudies/constants"
-	"github.com/joaogiacometti/gostudies/jsonutils"
+	"github.com/joaogiacometti/gocards/constants"
+	"github.com/joaogiacometti/gocards/jsonutils"
 )
 
 func (api *API) AuthMiddleware(next http.Handler) http.Handler {

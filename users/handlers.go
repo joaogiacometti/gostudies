@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/joaogiacometti/gostudies/constants"
-	"github.com/joaogiacometti/gostudies/exceptions"
-	"github.com/joaogiacometti/gostudies/jsonutils"
+	"github.com/joaogiacometti/gocards/constants"
+	"github.com/joaogiacometti/gocards/exceptions"
+	"github.com/joaogiacometti/gocards/jsonutils"
 	"golang.org/x/crypto/bcrypt"
 )
 

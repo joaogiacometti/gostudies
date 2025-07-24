@@ -3,9 +3,9 @@ package api
 import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
-	"github.com/joaogiacometti/gostudies/flashcards"
-	"github.com/joaogiacometti/gostudies/reviews"
-	"github.com/joaogiacometti/gostudies/users"
+	"github.com/joaogiacometti/gocards/flashcards"
+	"github.com/joaogiacometti/gocards/reviews"
+	"github.com/joaogiacometti/gocards/users"
 )
 
 type API struct {

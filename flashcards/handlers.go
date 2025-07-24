@@ -7,9 +7,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/joaogiacometti/gostudies/constants"
-	"github.com/joaogiacometti/gostudies/jsonutils"
-	"github.com/joaogiacometti/gostudies/pgstore"
+	"github.com/joaogiacometti/gocards/constants"
+	"github.com/joaogiacometti/gocards/jsonutils"
+	"github.com/joaogiacometti/gocards/pgstore"
 )
 
 type FlashcardHandler struct {

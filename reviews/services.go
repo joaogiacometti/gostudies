@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joaogiacometti/gostudies/pgstore"
+	"github.com/joaogiacometti/gocards/pgstore"
 )
 
 type ReviewService struct {
