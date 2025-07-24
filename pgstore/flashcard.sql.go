@@ -32,7 +32,7 @@ func (q *Queries) CreateFlashcard(ctx context.Context, arg CreateFlashcardParams
 }
 
 const getFlashcardByID = `-- name: GetFlashcardByID :one
-SELECT id, question, answer, created_at, updated_at
+SELECT id, question, answer, created_at, updated_at, success_count
 FROM flashcards
 WHERE id = $1 AND user_id = $2
 `
@@ -43,11 +43,12 @@ type GetFlashcardByIDParams struct {
 }
 
 type GetFlashcardByIDRow struct {
-	ID        uuid.UUID          `json:"id"`
-	Question  string             `json:"question"`
-	Answer    string             `json:"answer"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	ID           uuid.UUID          `json:"id"`
+	Question     string             `json:"question"`
+	Answer       string             `json:"answer"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+	SuccessCount pgtype.Int4        `json:"success_count"`
 }
 
 func (q *Queries) GetFlashcardByID(ctx context.Context, arg GetFlashcardByIDParams) (GetFlashcardByIDRow, error) {
@@ -59,6 +60,7 @@ func (q *Queries) GetFlashcardByID(ctx context.Context, arg GetFlashcardByIDPara
 		&i.Answer,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.SuccessCount,
 	)
 	return i, err
 }
@@ -103,6 +105,27 @@ func (q *Queries) GetFlashcards(ctx context.Context, userID uuid.UUID) ([]GetFla
 	return items, nil
 }
 
+const getNextFlashcardToReview = `-- name: GetNextFlashcardToReview :one
+SELECT id, question, answer
+FROM flashcards
+WHERE user_id = $1 and next_review_at <= NOW()
+ORDER BY next_review_at ASC
+LIMIT 1
+`
+
+type GetNextFlashcardToReviewRow struct {
+	ID       uuid.UUID `json:"id"`
+	Question string    `json:"question"`
+	Answer   string    `json:"answer"`
+}
+
+func (q *Queries) GetNextFlashcardToReview(ctx context.Context, userID uuid.UUID) (GetNextFlashcardToReviewRow, error) {
+	row := q.db.QueryRow(ctx, getNextFlashcardToReview, userID)
+	var i GetNextFlashcardToReviewRow
+	err := row.Scan(&i.ID, &i.Question, &i.Answer)
+	return i, err
+}
+
 const isDuplicateFlashcard = `-- name: IsDuplicateFlashcard :one
 SELECT EXISTS (
     SELECT 1 FROM flashcards
@@ -120,4 +143,30 @@ func (q *Queries) IsDuplicateFlashcard(ctx context.Context, arg IsDuplicateFlash
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const reviewFlashcard = `-- name: ReviewFlashcard :exec
+UPDATE flashcards
+SET success_count = $1,
+    next_review_at = $2,
+    last_reviewed_at = NOW(),
+    updated_at = NOW()
+WHERE id = $3 AND user_id = $4
+`
+
+type ReviewFlashcardParams struct {
+	SuccessCount pgtype.Int4        `json:"success_count"`
+	NextReviewAt pgtype.Timestamptz `json:"next_review_at"`
+	ID           uuid.UUID          `json:"id"`
+	UserID       uuid.UUID          `json:"user_id"`
+}
+
+func (q *Queries) ReviewFlashcard(ctx context.Context, arg ReviewFlashcardParams) error {
+	_, err := q.db.Exec(ctx, reviewFlashcard,
+		arg.SuccessCount,
+		arg.NextReviewAt,
+		arg.ID,
+		arg.UserID,
+	)
+	return err
 }

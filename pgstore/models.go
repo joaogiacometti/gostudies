@@ -10,12 +10,23 @@ import (
 )
 
 type Flashcard struct {
-	ID        uuid.UUID          `json:"id"`
-	Question  string             `json:"question"`
-	Answer    string             `json:"answer"`
-	UserID    uuid.UUID          `json:"user_id"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	ID             uuid.UUID          `json:"id"`
+	Question       string             `json:"question"`
+	Answer         string             `json:"answer"`
+	UserID         uuid.UUID          `json:"user_id"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+	LastReviewedAt pgtype.Timestamptz `json:"last_reviewed_at"`
+	NextReviewAt   pgtype.Timestamptz `json:"next_review_at"`
+	SuccessCount   pgtype.Int4        `json:"success_count"`
+}
+
+type Review struct {
+	ID          uuid.UUID          `json:"id"`
+	FlashcardID uuid.UUID          `json:"flashcard_id"`
+	UserID      uuid.UUID          `json:"user_id"`
+	Remembered  bool               `json:"remembered"`
+	ReviewedAt  pgtype.Timestamptz `json:"reviewed_at"`
 }
 
 type Session struct {

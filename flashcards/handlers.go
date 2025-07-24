@@ -6,6 +6,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/joaogiacometti/gostudies/constants"
 	"github.com/joaogiacometti/gostudies/jsonutils"
 	"github.com/joaogiacometti/gostudies/pgstore"
@@ -111,6 +112,29 @@ func (h *FlashcardHandler) HandleGetFlashcardByID(w http.ResponseWriter, r *http
 	if flashcard == (pgstore.GetFlashcardByIDRow{}) {
 		jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{
 			"error": "Flashcard not found",
+		})
+		return
+	}
+
+	jsonutils.EncodeJson(w, r, http.StatusOK, flashcard)
+}
+
+func (h *FlashcardHandler) HandleGetNextFlashcardToReview(w http.ResponseWriter, r *http.Request) {
+	userID := h.sessions.Get(r.Context(), constants.SessionKeyUserId).(uuid.UUID)
+	if userID == uuid.Nil {
+		jsonutils.EncodeJson(w, r, http.StatusUnauthorized, map[string]any{})
+		return
+	}
+
+	flashcard, err := h.service.queries.GetNextFlashcardToReview(r.Context(), userID)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			jsonutils.EncodeJson(w, r, http.StatusNoContent, map[string]any{})
+			return
+		}
+
+		jsonutils.EncodeJson(w, r, http.StatusInternalServerError, map[string]any{
+			"error": err.Error(),
 		})
 		return
 	}

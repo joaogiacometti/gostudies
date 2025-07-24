@@ -19,6 +19,8 @@ func (api *API) BindRoutes() {
 			r.Post("/", api.FlashcardHandlers.HandleCreateFlashcard)
 			r.Get("/", api.FlashcardHandlers.HandleGetFlashcards)
 			r.Get("/{flashcardID}", api.FlashcardHandlers.HandleGetFlashcardByID)
+			r.Get("/next", api.FlashcardHandlers.HandleGetNextFlashcardToReview)
+			r.Post("/{flashcardID}/review", api.ReviewHandlers.HandleReviewFlashcard)
 		})
 	})
 }

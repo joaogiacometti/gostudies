@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joaogiacometti/gostudies/api"
 	"github.com/joaogiacometti/gostudies/flashcards"
+	"github.com/joaogiacometti/gostudies/reviews"
 	"github.com/joaogiacometti/gostudies/users"
 	"github.com/joho/godotenv"
 )
@@ -35,17 +36,26 @@ func main() {
 
 	sessionManager := api.NewSessionManager(pool)
 
+	userHandlers := users.NewUserHandler(
+		users.NewUserService(pool),
+		sessionManager,
+	)
+	flashcardHandlers := flashcards.NewFlashcardHandler(
+		flashcards.NewFlashcardService(pool),
+		sessionManager,
+	)
+	reviewHandlers := reviews.NewReviewHandler(
+		reviews.NewReviewService(pool),
+		flashcards.NewFlashcardService(pool),
+		sessionManager,
+	)
+
 	app := api.API{
-		Router: chi.NewMux(),
-		UserHandlers: users.NewUserHandler(
-			users.NewUserService(pool),
-			sessionManager,
-		),
-		FlashcardHandlers: flashcards.NewFlashcardHandler(
-			flashcards.NewFlashcardService(pool),
-			sessionManager,
-		),
-		Sessions: sessionManager,
+		Router:            chi.NewMux(),
+		UserHandlers:      userHandlers,
+		FlashcardHandlers: flashcardHandlers,
+		ReviewHandlers:    reviewHandlers,
+		Sessions:          sessionManager,
 	}
 
 	app.BindRoutes()
