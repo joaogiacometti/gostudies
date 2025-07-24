@@ -10,9 +10,9 @@ func (api *API) BindRoutes() {
 
 	api.Router.Route("/api", func(r chi.Router) {
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/signup", api.handleSignup)
-			r.Post("/login", api.handleLogin)
-			r.With(api.AuthMiddleware).Post("/logout", api.handleLogout)
+			r.Post("/signup", api.UserHandlers.HandleSignup)
+			r.Post("/login", api.UserHandlers.HandleLogin)
+			r.With(api.AuthMiddleware).Post("/logout", api.UserHandlers.HandleLogout)
 		})
 	})
 }

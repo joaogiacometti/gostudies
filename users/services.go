@@ -1,4 +1,4 @@
-package services
+package users
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joaogiacometti/gostudies/internal/store/pgstore"
+	"github.com/joaogiacometti/gostudies/pgstore"
 	"golang.org/x/crypto/bcrypt"
 )
 
