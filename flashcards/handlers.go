@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/joaogiacometti/gostudies/constants"
 	"github.com/joaogiacometti/gostudies/jsonutils"
@@ -65,4 +66,54 @@ func (h *FlashcardHandler) HandleCreateFlashcard(w http.ResponseWriter, r *http.
 	jsonutils.EncodeJson(w, r, http.StatusCreated, map[string]any{
 		"flashcardID": flashcardID,
 	})
+}
+
+func (h *FlashcardHandler) HandleGetFlashcards(w http.ResponseWriter, r *http.Request) {
+	userID := h.sessions.Get(r.Context(), constants.SessionKeyUserId).(uuid.UUID)
+	if userID == uuid.Nil {
+		jsonutils.EncodeJson(w, r, http.StatusUnauthorized, map[string]any{})
+		return
+	}
+
+	flashcards, err := h.service.GetFlashcards(r.Context(), userID)
+	if err != nil {
+		jsonutils.EncodeJson(w, r, http.StatusInternalServerError, map[string]any{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	jsonutils.EncodeJson(w, r, http.StatusOK, flashcards)
+}
+
+func (h *FlashcardHandler) HandleGetFlashcardByID(w http.ResponseWriter, r *http.Request) {
+	flashcardID, err := uuid.Parse(chi.URLParam(r, "flashcardID"))
+	if err != nil {
+		jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{
+			"error": "Invalid flashcard ID",
+		})
+		return
+	}
+
+	userID := h.sessions.Get(r.Context(), constants.SessionKeyUserId).(uuid.UUID)
+	if userID == uuid.Nil {
+		jsonutils.EncodeJson(w, r, http.StatusUnauthorized, map[string]any{})
+		return
+	}
+	flashcard, err := h.service.GetFlashcardByID(r.Context(), flashcardID, userID)
+	if err != nil {
+		jsonutils.EncodeJson(w, r, http.StatusInternalServerError, map[string]any{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if flashcard == (pgstore.GetFlashcardByIDRow{}) {
+		jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{
+			"error": "Flashcard not found",
+		})
+		return
+	}
+
+	jsonutils.EncodeJson(w, r, http.StatusOK, flashcard)
 }

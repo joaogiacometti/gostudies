@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createFlashcard = `-- name: CreateFlashcard :one
@@ -28,6 +29,78 @@ func (q *Queries) CreateFlashcard(ctx context.Context, arg CreateFlashcardParams
 	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getFlashcardByID = `-- name: GetFlashcardByID :one
+SELECT id, question, answer, created_at, updated_at
+FROM flashcards
+WHERE id = $1 AND user_id = $2
+`
+
+type GetFlashcardByIDParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+type GetFlashcardByIDRow struct {
+	ID        uuid.UUID          `json:"id"`
+	Question  string             `json:"question"`
+	Answer    string             `json:"answer"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) GetFlashcardByID(ctx context.Context, arg GetFlashcardByIDParams) (GetFlashcardByIDRow, error) {
+	row := q.db.QueryRow(ctx, getFlashcardByID, arg.ID, arg.UserID)
+	var i GetFlashcardByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Question,
+		&i.Answer,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getFlashcards = `-- name: GetFlashcards :many
+SELECT id, question, answer, created_at, updated_at
+FROM flashcards
+WHERE user_id = $1
+`
+
+type GetFlashcardsRow struct {
+	ID        uuid.UUID          `json:"id"`
+	Question  string             `json:"question"`
+	Answer    string             `json:"answer"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) GetFlashcards(ctx context.Context, userID uuid.UUID) ([]GetFlashcardsRow, error) {
+	rows, err := q.db.Query(ctx, getFlashcards, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFlashcardsRow
+	for rows.Next() {
+		var i GetFlashcardsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Question,
+			&i.Answer,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const isDuplicateFlashcard = `-- name: IsDuplicateFlashcard :one

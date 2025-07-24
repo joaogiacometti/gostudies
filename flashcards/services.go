@@ -32,3 +32,24 @@ func (fs *FlashcardService) CreateFlashcard(ctx context.Context, userID uuid.UUI
 
 	return flashcardID, nil
 }
+
+func (fs *FlashcardService) GetFlashcards(ctx context.Context, userID uuid.UUID) ([]pgstore.GetFlashcardsRow, error) {
+	entities, err := fs.queries.GetFlashcards(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return entities, nil
+}
+
+func (fs *FlashcardService) GetFlashcardByID(ctx context.Context, flashcardID uuid.UUID, userID uuid.UUID) (pgstore.GetFlashcardByIDRow, error) {
+	entity, err := fs.queries.GetFlashcardByID(ctx, pgstore.GetFlashcardByIDParams{
+		ID:     flashcardID,
+		UserID: userID,
+	})
+	if err != nil {
+		return pgstore.GetFlashcardByIDRow{}, err
+	}
+
+	return entity, nil
+}
