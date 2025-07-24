@@ -9,6 +9,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Flashcard struct {
+	ID        uuid.UUID          `json:"id"`
+	Question  string             `json:"question"`
+	Answer    string             `json:"answer"`
+	UserID    uuid.UUID          `json:"user_id"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Session struct {
 	Token  string             `json:"token"`
 	Data   []byte             `json:"data"`

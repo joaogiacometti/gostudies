@@ -14,5 +14,9 @@ func (api *API) BindRoutes() {
 			r.Post("/login", api.UserHandlers.HandleLogin)
 			r.With(api.AuthMiddleware).Post("/logout", api.UserHandlers.HandleLogout)
 		})
+
+		r.Route("/flashcards", func(r chi.Router) {
+			r.With(api.AuthMiddleware).Post("/", api.FlashcardHandlers.HandleCreateFlashcard)
+		})
 	})
 }

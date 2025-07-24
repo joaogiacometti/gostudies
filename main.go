@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joaogiacometti/gostudies/api"
+	"github.com/joaogiacometti/gostudies/flashcards"
 	"github.com/joaogiacometti/gostudies/users"
 	"github.com/joho/godotenv"
 )
@@ -38,6 +39,10 @@ func main() {
 		Router: chi.NewMux(),
 		UserHandlers: users.NewUserHandler(
 			users.NewUserService(pool),
+			sessionManager,
+		),
+		FlashcardHandlers: flashcards.NewFlashcardHandler(
+			flashcards.NewFlashcardService(pool),
 			sessionManager,
 		),
 		Sessions: sessionManager,

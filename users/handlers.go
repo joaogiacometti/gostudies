@@ -23,7 +23,7 @@ func NewUserHandler(userService *UserService, sessions *scs.SessionManager) *Use
 }
 
 func (h *UserHandler) HandleSignup(w http.ResponseWriter, r *http.Request) {
-	data, err := jsonutils.DecodeValidJson[CreateUserRequest](r)
+	data, err := jsonutils.DecodeValidJson[RequestCreateUser](r)
 	if err != nil {
 		jsonutils.EncodeJson(w, r, http.StatusUnprocessableEntity, map[string]any{
 			"error": err.Error(),

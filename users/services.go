@@ -23,9 +23,6 @@ func NewUserService(pool *pgxpool.Pool) *UserService {
 	}
 }
 
-var ErrDuplicatedUsernameOrEmail = errors.New("username or email already exists")
-var ErrInvalidCredentials = errors.New("invalid credentials")
-
 func (us *UserService) CreateUser(ctx context.Context, username, email string, password_hash []byte) (uuid.UUID, error) {
 	userId, err := us.queries.CreateUser(ctx, pgstore.CreateUserParams{
 		UserName:     username,
@@ -35,7 +32,7 @@ func (us *UserService) CreateUser(ctx context.Context, username, email string, p
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && (pgErr.Code == "23505") {
-			return uuid.Nil, ErrDuplicatedUsernameOrEmail
+			return uuid.Nil, errors.New("username or email already exists")
 		}
 		return uuid.Nil, err
 	}
@@ -51,7 +48,7 @@ func (us *UserService) AuthenticateUser(ctx context.Context, email, password str
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return uuid.Nil, ErrInvalidCredentials
+			return uuid.Nil, errors.New("invalid credentials")
 		}
 
 		return uuid.Nil, err
